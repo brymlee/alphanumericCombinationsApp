@@ -4,8 +4,15 @@
   "description": "This package is for a web applications that displays purmutations and combinations of alphanumeric characters given a digit count.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "deploy": "gcloud functions deploy alphanumericCombinationsApp --runtime nodejs8 --trigger-http"
   },
   "author": "Evan Kimberlin",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "24.8.0"
+  },
+  "dependencies": {
+    "read-file": "^0.2.0"
+  }
 }
