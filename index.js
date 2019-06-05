@@ -25,3 +25,8 @@ exports.factorial = (targetInteger) => {
 		return recursiveFactorial(targetInteger, targetInteger - 1)
 	}
 }
+
+exports.combinations = (targetInteger, countOfThem) => {
+	return factorial(targetInteger) / 
+	(factorial(countOfThem) * factorial(targetInteger - countOfThem))
+}
