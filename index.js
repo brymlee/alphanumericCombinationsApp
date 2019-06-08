@@ -8,38 +8,37 @@ exports.alphanumericCombinationsApp = (request, response) => {
 			.send(buffer.toString())
 	})
 }
-
+const alphaMap = [
+	{ id: 0, alpha: 'A' },
+	{ id: 1, alpha: 'B' },
+	{ id: 2, alpha: 'C' },
+	{ id: 3, alpha: 'D' },
+	{ id: 4, alpha: 'E' },
+	{ id: 5, alpha: 'F' },
+	{ id: 6, alpha: 'G' },
+	{ id: 7, alpha: 'H' },
+	{ id: 8, alpha: 'I' },
+	{ id: 9, alpha: 'J' },
+	{ id: 10, alpha: 'K' },
+	{ id: 11, alpha: 'L' },
+	{ id: 12, alpha: 'M' },
+	{ id: 13, alpha: 'N' },
+	{ id: 14, alpha: 'O' },
+	{ id: 15, alpha: 'P' },
+	{ id: 16, alpha: 'Q' },
+	{ id: 17, alpha: 'R' },
+	{ id: 18, alpha: 'S' },
+	{ id: 19, alpha: 'T' },
+	{ id: 20, alpha: 'U' },
+	{ id: 21, alpha: 'V' },
+	{ id: 22, alpha: 'Q' },
+	{ id: 23, alpha: 'W' },
+	{ id: 24, alpha: 'X' },
+	{ id: 25, alpha: 'Y' },
+	{ id: 26, alpha: 'Z' }
+]
+const alpha = /^[A-Z]+$/
 exports.counter = (target, base) => {
-	const alphaMap = [
-		{ id: 0, alpha: 'A' },
-		{ id: 1, alpha: 'B' },
-		{ id: 2, alpha: 'C' },
-		{ id: 3, alpha: 'D' },
-		{ id: 4, alpha: 'E' },
-		{ id: 5, alpha: 'F' },
-		{ id: 6, alpha: 'G' },
-		{ id: 7, alpha: 'H' },
-		{ id: 8, alpha: 'I' },
-		{ id: 9, alpha: 'J' },
-		{ id: 10, alpha: 'K' },
-		{ id: 11, alpha: 'L' },
-		{ id: 12, alpha: 'M' },
-		{ id: 13, alpha: 'N' },
-		{ id: 14, alpha: 'O' },
-		{ id: 15, alpha: 'P' },
-		{ id: 16, alpha: 'Q' },
-		{ id: 17, alpha: 'R' },
-		{ id: 18, alpha: 'S' },
-		{ id: 19, alpha: 'T' },
-		{ id: 20, alpha: 'U' },
-		{ id: 21, alpha: 'V' },
-		{ id: 22, alpha: 'Q' },
-		{ id: 23, alpha: 'W' },
-		{ id: 24, alpha: 'X' },
-		{ id: 25, alpha: 'Y' },
-		{ id: 26, alpha: 'Z' }
-	]	
-	const alpha = /^[A-Z]+$/
 	const alphaSmallCase = /^[a-z]+$/
 	const range = (closed, open, numbers) => {
 		if(closed >= open){
@@ -51,7 +50,6 @@ exports.counter = (target, base) => {
 		}
 	}
 	const countAndCarry = (numberfiedDigits, index, doCountUp) => {
-		console.log(numberfiedDigits, index, doCountUp)
 		if(index < 0){
 			return numberfiedDigits
 		}else if(doCountUp){
@@ -79,11 +77,27 @@ exports.counter = (target, base) => {
 					return {
 						index: digit.index,
 						value: digit.value,
-						carry: false
+						carry: digit.index === 0 ? digit.carry : false
 					}
 				})
-			if(isCarrying){
+			const carryLastIndex = falseOutCarries[0].carry
+			if(isCarrying && !carryLastIndex){
 				return countAndCarry(falseOutCarries, index - 1, true)
+			}else if(isCarrying && carryLastIndex){
+				return countAndCarry(
+					[{
+						index: 0,
+						value: 1,
+						carry: false
+					}]
+					.concat(falseOutCarries)
+					.map(digit => {
+						return {
+							index: digit.index + 1,
+							value: digit.value,
+							carry: false
+						}
+					}), index, false)
 			}else{
 				return countAndCarry(falseOutCarries, index - 1, false)
 			}
@@ -130,4 +144,43 @@ exports.counter = (target, base) => {
 	}else{
 		return (target + 1).toString()
 	}
+}
+
+exports.countTill = (end, base) => {
+	const countTill = (index, end, base, numbers) => {
+		const trueIndex = index != undefined ? index : '0'
+		if(trueIndex === end 
+		|| trueIndex.length > end.length){
+			return numbers
+		}else{
+			const newNumber = exports.counter(trueIndex, base)
+			const newNumbers = numbers.concat([newNumber])
+			return countTill(newNumber, end, base, newNumbers)
+		}
+	}
+	return ['0'].concat(countTill(undefined, end, base, []))
+}
+
+exports.combinations = (hand, base) => {
+	const numeric = /^[0-9]+$/
+	const toValue = (character) => {
+		if(character.match(numeric)){
+			return character
+		}else if(character.match(alpha)){
+			return alphaMap.find(map => map.alpha === character).id
+		}
+	}
+	const unsortedNumbers = exports.countTill('1' + (hand * '0'), base)
+	const sortedNumbers = unsortedNumbers
+		.map((a, b) => {
+			const aValue = toValue(a) 
+			const bValue = toValue(b)
+			if(aValue < bValue){
+				return -1
+			}else if(aValue === bValue){
+				return 0
+			}else{
+				return 1
+			}
+		})
 }
