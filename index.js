@@ -38,17 +38,17 @@ const alphaMap = [
 	{ id: 26, alpha: 'Z' }
 ]
 const alpha = /^[A-Z]+$/
+const range = (closed, open, numbers) => {
+	if(closed >= open){
+		return numbers
+	}else if(closed + 1 === open){
+		return numbers.concat([closed])
+	}else{
+		return range(closed + 1, open, numbers.concat([closed]))
+	}
+}
 exports.counter = (target, base) => {
 	const alphaSmallCase = /^[a-z]+$/
-	const range = (closed, open, numbers) => {
-		if(closed >= open){
-			return numbers
-		}else if(closed + 1 === open){
-			return numbers.concat([closed])
-		}else{
-			return range(closed + 1, open, numbers.concat([closed]))
-		}
-	}
 	const countAndCarry = (numberfiedDigits, index, doCountUp) => {
 		if(index < 0){
 			return numberfiedDigits
@@ -142,13 +142,13 @@ exports.counter = (target, base) => {
 				}
 			}).reduce((accumulator, currentValue) => accumulator + currentValue)
 	}else{
-		return (target + 1).toString()
+		return (parseInt(target) + 1).toString()
 	}
 }
 
 exports.countTill = (end, base) => {
 	const countTill = (index, end, base, numbers) => {
-		const trueIndex = index != undefined ? index : '0'
+		const trueIndex = index != undefined ? index : 0 
 		if(trueIndex === end 
 		|| trueIndex.length > end.length){
 			return numbers
@@ -158,7 +158,7 @@ exports.countTill = (end, base) => {
 			return countTill(newNumber, end, base, newNumbers)
 		}
 	}
-	return ['0'].concat(countTill(undefined, end, base, []))
+	return countTill(undefined, end, base, [])
 }
 
 exports.combinations = (hand, base) => {
@@ -170,17 +170,67 @@ exports.combinations = (hand, base) => {
 			return alphaMap.find(map => map.alpha === character).id
 		}
 	}
-	const unsortedNumbers = exports.countTill('1' + (hand * '0'), base)
-	const sortedNumbers = unsortedNumbers
-		.map((a, b) => {
-			const aValue = toValue(a) 
-			const bValue = toValue(b)
-			if(aValue < bValue){
-				return -1
-			}else if(aValue === bValue){
-				return 0
+	const toMapId = (sortedNumber) => {
+		const removeDuplicateCharacters = (sortedNumber, mapId, index, lastCharacter) =>{
+			const getCurrentCharacter = () => sortedNumber[index]
+			if(index >= sortedNumber.length){
+				if(mapId.length < hand){
+					return '0'.repeat(hand - mapId.length) + mapId
+				}else{
+					return mapId
+				}
+			}else if(getCurrentCharacter() != lastCharacter){
+				return removeDuplicateCharacters(sortedNumber, mapId + getCurrentCharacter(), index + 1, getCurrentCharacter()) 
 			}else{
-				return 1
+				return removeDuplicateCharacters(sortedNumber, mapId, index + 1, getCurrentCharacter())
+			}
+		}
+		return removeDuplicateCharacters(sortedNumber, '', 0, '') 
+	}
+	const removeDuplicates = (unsortedNumbers, sortedNumbers) => {
+		const removeDuplicates = (unsortedNumbers, sortedNumbers, index, map) => {
+			if(index >= unsortedNumbers.length){
+				return map
+			}else{
+				const unsortedNumber = unsortedNumbers[index]
+				const sortedNumber = sortedNumbers[index]
+				const mapId = toMapId(sortedNumber)
+				if(map.some(mapping => mapping.mapId === mapId)){
+					return removeDuplicates(unsortedNumbers, sortedNumbers, index + 1, map)
+				}else{
+					const newMap = map.concat([{
+						unsortedNumber: unsortedNumber,
+						mapId: mapId
+					}])
+					return removeDuplicates(unsortedNumbers, sortedNumbers, index + 1, newMap)
+				}
+			}
+		}
+		return removeDuplicates(unsortedNumbers, sortedNumbers, 0, [])
+			.map(mapping => mapping.unsortedNumber)
+	}
+	const end = '1' + ('0'.repeat(hand))
+	const unsortedNumbers = exports.countTill(end, base)
+	const sortedNumbers = unsortedNumbers
+		.map(number => {
+			const newNumber = number
+				.split('')
+				.sort((a, b) => {
+					const aValue = toValue(a) 
+					const bValue = toValue(b)
+					if(aValue < bValue){
+						return -1
+					}else if(aValue === bValue){
+						return 0
+					}else{
+						return 1
+					}
+				}).reduce((accumulator, currentValue) => accumulator + currentValue)
+			if(newNumber.length < hand){
+				return '0'.repeat(hand - newNumber.length) + newNumber 
+			}else{
+				return newNumber
 			}
 		})
+	return removeDuplicates(unsortedNumbers, sortedNumbers)
 }
