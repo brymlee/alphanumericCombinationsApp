@@ -1,11 +1,23 @@
 <html>
 	<head>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script>
+			$(document).ready(() => {
+
+				/*$.get("https://us-central1-chipless-236701.cloudfunctions.net/alphanumericCombinationsRest", data => {
+					
+				})*/
+			})
+		</script>
 	</head>
 	<body>
-		<label for="base">Input your base here:</label>
-		<input id="base" type="text" size="1">
-		<label for="digit">Input your digit count here:</label>
-		<input id="digit" type="text" size="1">
+		<form action="https://us-central1-chipless-236701.cloudfunctions.net/alphanumericCombinationsRest">
+			<label for="base">Input your base here:</label>
+			<input id="base" type="text" size="1">
+			<label for="digit">Input your digit count here:</label>
+			<input id="digit" type="text" size="1">
+			<!--<button id="downloadCsv" type="button">Download CSV</button>-->
+			<input id="downloadCsv" type="submit" value="Get CSV">
+		</form>
 	</body>
 </html>
