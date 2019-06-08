@@ -8,6 +8,7 @@ exports.alphanumericCombinationsApp = (request, response) => {
 			.send(buffer.toString())
 	})
 }
+
 const alphaMap = [
 	{ id: 0, alpha: 'A' },
 	{ id: 1, alpha: 'B' },

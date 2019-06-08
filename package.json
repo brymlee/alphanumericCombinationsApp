@@ -13,7 +13,6 @@
     "jest": "24.8.0"
   },
   "dependencies": {
-    "mathjs": "^5.10.3",
     "read-file": "^0.2.0"
   }
 }
