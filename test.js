@@ -1,19 +1,8 @@
 const read = require('read-file')
-const math = require('mathjs')
 const factorial = require('./index.js').factorial
-const combinations = require('./index.js').combinations
+const counter = require('./index.js').counter
 test('sanity check', () => expect(1).toBe(1))
-test('when converting index.html to string then should contain html', () => {
-	read('index.html', 'utf8', (error, buffer) => {
-		expect(buffer.toString()).toContain('<html>')
-	})
-})
-test('when getting the factorial of 4 then we should get 24', () => expect(factorial(4)).toBe(24))
-test('when getting the factorial of 3 then we should get 6', () => expect(factorial(3)).toBe(6))
-test('when getting the factorial of 0 then we should get 1', () => expect(factorial(0)).toBe(1))
-test('when getting the combinations of 52 with a count of 5 then we should get the factorial of 47', () => {
-	console.log(typeof math.eval('47!'))
-	expect(math.eval('52! / (5!(47!))')).toBe(math.eval('47!'))
-})
-
-
+test('when counting and target is 1 and base is 10 then should return 2', () => expect(counter(1, 10)).toBe('2'))
+test('when counting and target is 9 and base is 16 then should return A', () => expect(counter(9, 16)).toBe('A'))
+test('when counting and target is A and base is 16 then should return B', () => expect(counter('A', 16)).toBe('B'))
+test('when counting and target is 19 and base is 16 then should return 1A', () => expect(counter(19, 16)).toBe('1A'))

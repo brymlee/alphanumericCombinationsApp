@@ -9,24 +9,125 @@ exports.alphanumericCombinationsApp = (request, response) => {
 	})
 }
 
-exports.factorial = (targetInteger) => {
-	const recursiveFactorial = (product, index) => {
-		if(index <= 0){
-			return product
+exports.counter = (target, base) => {
+	const alphaMap = [
+		{ id: 0, alpha: 'A' },
+		{ id: 1, alpha: 'B' },
+		{ id: 2, alpha: 'C' },
+		{ id: 3, alpha: 'D' },
+		{ id: 4, alpha: 'E' },
+		{ id: 5, alpha: 'F' },
+		{ id: 6, alpha: 'G' },
+		{ id: 7, alpha: 'H' },
+		{ id: 8, alpha: 'I' },
+		{ id: 9, alpha: 'J' },
+		{ id: 10, alpha: 'K' },
+		{ id: 11, alpha: 'L' },
+		{ id: 12, alpha: 'M' },
+		{ id: 13, alpha: 'N' },
+		{ id: 14, alpha: 'O' },
+		{ id: 15, alpha: 'P' },
+		{ id: 16, alpha: 'Q' },
+		{ id: 17, alpha: 'R' },
+		{ id: 18, alpha: 'S' },
+		{ id: 19, alpha: 'T' },
+		{ id: 20, alpha: 'U' },
+		{ id: 21, alpha: 'V' },
+		{ id: 22, alpha: 'Q' },
+		{ id: 23, alpha: 'W' },
+		{ id: 24, alpha: 'X' },
+		{ id: 25, alpha: 'Y' },
+		{ id: 26, alpha: 'Z' }
+	]	
+	const alpha = /^[A-Z]+$/
+	const alphaSmallCase = /^[a-z]+$/
+	const range = (closed, open, numbers) => {
+		if(closed >= open){
+			return numbers
+		}else if(closed + 1 === open){
+			return numbers.concat([closed])
 		}else{
-			return recursiveFactorial(product * index, index - 1)
+			return range(closed + 1, open, numbers.concat([closed]))
 		}
 	}
-	if(targetInteger === 0){
-		return 1
-	}else if(targetInteger < 0){
-		throw new Error('targetInteger must be a positive integer')
-	}else{
-		return recursiveFactorial(targetInteger, targetInteger - 1)
+	const countAndCarry = (numberfiedDigits, index, doCountUp) => {
+		console.log(numberfiedDigits, index, doCountUp)
+		if(index < 0){
+			return numberfiedDigits
+		}else if(doCountUp){
+			const newNumberfiedDigits = numberfiedDigits
+				.map(digit => {
+					if(digit.index === index){
+						const nextDigitValue = digit.value + 1
+						const isDigitAtBase = nextDigitValue === base
+						return { 
+							index: digit.index, 
+							value: isDigitAtBase ? 0 : nextDigitValue,
+							carry: isDigitAtBase
+						} 
+					}else{
+						return {
+							index: digit.index,
+							value: digit.value,
+							carry: false
+						}
+					}
+				})
+			const isCarrying = newNumberfiedDigits.some(digit => digit.carry)
+			const falseOutCarries = newNumberfiedDigits
+				.map(digit => {
+					return {
+						index: digit.index,
+						value: digit.value,
+						carry: false
+					}
+				})
+			if(isCarrying){
+				return countAndCarry(falseOutCarries, index - 1, true)
+			}else{
+				return countAndCarry(falseOutCarries, index - 1, false)
+			}
+		}else{
+			return numberfiedDigits
+		}
 	}
-}
-
-exports.combinations = (targetInteger, countOfThem) => {
-	return factorial(targetInteger) / 
-	(factorial(countOfThem) * factorial(targetInteger - countOfThem))
+	if(base > 10){
+		const numberfiedDigits = target.toString().split('')
+			.filter(character => character != '' && character != ' ')
+			.map(character => {
+				if(character.match(alphaSmallCase)){
+					return character.toUpperCase()
+				}else{
+					return character
+				}
+			}).map(character => {
+				if(character.match(alpha)){
+					return alphaMap
+						.find(mapping => mapping.alpha === character)
+						.id + 10
+				}else{
+					return parseInt(character)
+				}
+			})
+		const numberfiedDigitEntities = range(0, numberfiedDigits.length, [])
+			.map(index => {
+				return {
+					index: index,
+					value: numberfiedDigits[index],
+					carry: false
+				}
+			})
+		return countAndCarry(numberfiedDigitEntities, numberfiedDigitEntities.length - 1, true)
+			.map(digit => {
+				if(digit.value >= 10){
+					return alphaMap
+						.find(mapping => mapping.id === digit.value - 10)
+						.alpha
+				}else{
+					return digit.value.toString()
+				}
+			}).reduce((accumulator, currentValue) => accumulator + currentValue)
+	}else{
+		return (target + 1).toString()
+	}
 }
