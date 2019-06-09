@@ -11,11 +11,11 @@
 		</script>
 	</head>
 	<body>
-		<form action="https://us-central1-chipless-236701.cloudfunctions.net/alphanumericCombinationsRest">
+		<form action="https://us-central1-chipless-236701.cloudfunctions.net/alphanumericCombinationsRest/combinations.csv" method="GET">
 			<label for="base">Input your base here:</label>
-			<input id="base" type="text" size="1">
-			<label for="digit">Input your digit count here:</label>
-			<input id="digit" type="text" size="1">
+			<input id="base" name="base" type="text" size="1">
+			<label for="digits">Input your digit count here:</label>
+			<input id="digits" name="digits" type="text" size="1">
 			<!--<button id="downloadCsv" type="button">Download CSV</button>-->
 			<input id="downloadCsv" type="submit" value="Get CSV">
 		</form>
